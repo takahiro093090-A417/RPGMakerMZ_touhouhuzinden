@@ -1,0 +1,10 @@
+[
+null,
+{"id":1,"expanded":true,"name":"博麗神社","order":3,"parentId":0,"scrollX":811,"scrollY":483,"quick":false},
+{"id":2,"expanded":true,"name":"フィールド1","order":1,"parentId":0,"scrollX":3608,"scrollY":3598,"quick":false},
+{"id":3,"expanded":false,"name":"デペロッパールーム","order":4,"parentId":1,"scrollX":811,"scrollY":483,"quick":false},
+{"id":4,"expanded":false,"name":"普通の町","order":5,"parentId":0,"scrollX":819,"scrollY":874,"quick":false},
+{"id":5,"expanded":true,"name":"岩の洞窟","order":6,"parentId":0,"scrollX":816,"scrollY":677,"quick":false},
+{"id":6,"expanded":true,"name":"ファストトラベル","order":2,"parentId":0,"scrollX":3608,"scrollY":3594,"quick":false},
+{"id":7,"expanded":false,"name":"呪われた洞窟","order":7,"parentId":5,"scrollX":1685,"scrollY":1229,"quick":false}
+]
