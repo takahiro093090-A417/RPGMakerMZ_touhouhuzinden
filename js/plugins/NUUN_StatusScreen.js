@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.14
+ * @version 2.7.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -45,6 +45,14 @@
  * this._actorまたはactor 表示中のアクターのゲームデータ
  * dactor 表示中のアクターのデータベース
  * aclass 表示中のアクターの職業データ
+ * 
+ * ステート、属性耐性
+ * rate:耐性率
+ * 
+ * レーダーチャート
+ * レーダーチャートに表示する数値に適用されます。
+ * value:パラメータ
+ * 
  * 
  * 属性耐性、属性耐性
  * rate 単位付きの属性、ステート有効度
@@ -104,6 +112,17 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/10/19 Ver.2.7.3
+ * 表示できる項目にスキルポイント(要NUUN_SkillTree)を追加。
+ * 2025/8/8 Ver.2.7.2
+ * レーダーチャートのパラメータ名の表示方法の仕様を変更。
+ * 2025/8/2 Ver.2.7.1
+ * 属性、ステートの耐性率に耐性、弱点による文字色を変更できる機能を追加。(一覧表示、レーダーチャート)
+ * 評価式or文字列(3)をレーダーチャートにも適用できるように修正。
+ * 2025/7/20 Ver.2.7.0
+ * ステータスのレーダーチャートを追加。
+ * 属性のレーダーチャート数値座標設定が無かった問題を修正。
+ * レーダーチャートの数値の修正。
  * 2025/6/5 Ver.2.6.14
  * レーダーチャートに数値を表示する機能実装による更新。
  * 2025/4/13 Ver.2.6.13
@@ -413,6 +432,22 @@
  * @default 
  * @parent Setting
  * 
+ * @param ResistanceColor
+ * @desc 耐性のパラメータの数値色。(属性、ステート) 
+ * @text 耐性数値色
+ * @type color
+ * @default 0
+ * @min 0
+ * @parent Setting
+ * 
+ * @param WeaknessColor
+ * @desc 弱点のパラメータの数値色。(属性、ステート)
+ * @text 弱点数値色
+ * @type color
+ * @default 0
+ * @min 0
+ * @parent Setting
+ * 
  * @param PageSetting
  * @text ページ設定
  * @default ------------------------------
@@ -703,9 +738,129 @@
  * @default 0
  * @parent StateStateSetting
  * 
+ * 
+ * @param RadarChartSetting
+ * @text レーダーチャート設定
+ * @default 要NUUN_RadarChartBase
+ * 
+ * @param StatusRadarChart
+ * @text ステータスレーダーチャート
+ * @default ------------------------------
+ * @parent RadarChartSetting
+ * 
+ * @param StatusRadarChartParamList
+ * @desc 表示するステータス。
+ * @text 表示ステータス
+ * @type struct<RadarChartParamList>[]
+ * @default 
+ * @parent StatusRadarChart
+ * 
+ * @param DisplayNameModo
+ * @desc レーダーチャートのパラメータ名表示を指定します。
+ * @text パラメータ名表示
+ * @type select
+ * @option アイコンのみ
+ * @value icon
+ * @option パラメータ名のみ
+ * @value param
+ * @option アイコン及びパラメータ名
+ * @value iconparams
+ * @default param
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartRadius
+ * @desc レーダチャートの半径。
+ * @text レーダチャート半径
+ * @type number
+ * @default 100
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartFramecolor
+ * @desc レーダチャートの枠の色を設定します。
+ * @text レーダチャート枠色
+ * @type color
+ * @default 15
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartLineColor
+ * @desc レーダチャートの線の色を設定します。
+ * @text レーダチャート線色
+ * @type color
+ * @default 15
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartMainColor1
+ * @desc レーダチャートの中心の背景色を設定します。
+ * @text レーダチャート中心背景色
+ * @type color
+ * @default 3
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartMainColor2
+ * @desc レーダチャートの外側背景色を設定します。
+ * @text レーダチャート外側背景色
+ * @type color
+ * @default 3
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartX
+ * @desc レーダチャートのX座標（相対）。
+ * @text レーダチャートX座標
+ * @type number
+ * @min -9999
+ * @max 9999
+ * @default 48
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartY
+ * @desc レーダチャートのY座標（相対）。
+ * @text レーダチャートY座標
+ * @type number
+ * @min -9999
+ * @max 9999
+ * @default 48
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChart_FontSize
+ * @desc フォントサイズ。（メインフォントから）
+ * @text フォントサイズ
+ * @type number
+ * @default -12
+ * @min -9999
+ * @max 9999
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChart_IconSize
+ * @desc アイコンサイズを指定します。0でデフォルトサイズ
+ * @text アイコンサイズ
+ * @type number
+ * @default 0
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartValueData
+ * @desc レーダーチャートに表示する数値設定。
+ * @text 数値設定
+ * @type struct<RadarChartValue>
+ * @default
+ * @parent StatusRadarChart
+ * 
  * @param ElementRadarChart
  * @text 属性耐性レーダーチャート
  * @default ------------------------------
+ * @parent RadarChartSetting
+ * 
+ * @param ElementDisplayNameModo
+ * @desc レーダーチャートのパラメータ名表示を指定します。
+ * @text パラメータ名表示
+ * @type select
+ * @option アイコンのみ
+ * @value icon
+ * @option パラメータ名のみ
+ * @value param
+ * @option アイコン及びパラメータ名
+ * @value iconparam
+ * @default icon
+ * @parent ElementRadarChart
  * 
  * @param ElementRadarChartRadius
  * @desc レーダチャートの半径。
@@ -769,6 +924,13 @@
  * @max 9999
  * @parent ElementRadarChart
  * 
+ * @param ElementRadarChart_IconSize
+ * @desc アイコンサイズを指定します。0でデフォルトサイズ
+ * @text アイコンサイズ
+ * @type number
+ * @default 0
+ * @parent ElementRadarChart
+ * 
  * @param ElementRadarChartValueData
  * @desc レーダーチャートに表示する数値設定。
  * @text 数値設定
@@ -779,6 +941,20 @@
  * @param StateRadarChart
  * @text ステート耐性レーダーチャート
  * @default ------------------------------
+ * @parent RadarChartSetting
+ * 
+ * @param StateDisplayNameModo
+ * @desc レーダーチャートのパラメータ名表示を指定します。
+ * @text パラメータ名表示
+ * @type select
+ * @option アイコンのみ
+ * @value icon
+ * @option パラメータ名のみ
+ * @value param
+ * @option アイコン及びパラメータ名
+ * @value iconparam
+ * @default icon
+ * @parent StateRadarChart
  * 
  * @param StateRadarChartRadius
  * @desc レーダチャートの半径。
@@ -839,6 +1015,13 @@
  * @min -9999
  * @parent StateRadarChart
  * 
+ * @param StateRadarChart_IconSize
+ * @desc アイコンサイズを指定します。0でデフォルトサイズ
+ * @text アイコンサイズ
+ * @type number
+ * @default 0
+ * @parent StateRadarChart
+ * 
  * @param StateRadarChartValueData
  * @desc レーダーチャートに表示する数値設定。
  * @text 数値設定
@@ -849,7 +1032,7 @@
  */
 /*~struct~RadarChartParamList:
  * 
- * @param ParamLists
+ * @param Param
  * @desc レーダーチャートに表示する項目を指定します。
  * @text 表示する項目
  * @type select
@@ -878,12 +1061,32 @@
  * @default
  * 
  * @param RadarChartIconIndex
- * @desc 項目のアイコンインデックス。0の場合は名称が表示されます。
+ * @desc 項目のアイコンインデックス。
  * @text アイコンインデックス
  * @type icon
  * @default 0
  * @min 0
  * @max 99999
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
  *  
  */
 /*~struct~actorImgList:
@@ -945,6 +1148,27 @@
  * @min 0
  * @max 99999
  * @default 0
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
  */
 /*~struct~StateData:
  *
@@ -989,26 +1213,6 @@
  * @type icon
  * @min 0
  * @default 0
- * 
- * @param RadarChartShowValue
- * @text 数値の座標
- * @desc ----------------------------------
- * 
- * @param ValueX
- * @desc レーダーチャートの数値の個別X座標。
- * @text レーダーチャート数値個別X座標
- * @type number
- * @default 0
- * @min -9999
- * @parent RadarChartShowValue
- * 
- * @param ValueY
- * @desc レーダーチャートの数値の個別Y座標。
- * @text レーダーチャート数値個別Y座標
- * @type number
- * @default 0
- * @min -9999
- * @parent RadarChartShowValue
  *
  */
 /*~struct~PageListData:
@@ -1052,6 +1256,8 @@
  * @value 5
  * @option ステート(戦闘用と同じ表示)(4)(5)(6)(7)
  * @value 6
+ * @option スキルポイント(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
+ * @value 9
  * @option ＨＰ(4)(5)(6)(7)
  * @value 10
  * @option ＭＰ(4)(5)(6)(7)
@@ -1142,9 +1348,11 @@
  * @value 101
  * @option サイドビューアクター画像(4)(5)(6)(7)(8)(10)
  * @value 102
- * @option 属性耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
+ * @option ステータスレーダーチャート(3)(4)(5)(6)(7)(8)(10)(15)
+ * @value 200
+ * @option 属性耐性レーダーチャート(3)(4)(5)(6)(7)(8)(10)(15)
  * @value 201
- * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
+ * @option ステート耐性レーダーチャート(3)(4)(5)(6)(7)(8)(10)(15)
  * @value 202
  * @option 画像（共通画像）(3)(4)～(7)(22)
  * @value 300
@@ -1447,6 +1655,8 @@ const DefaultFontSize = Number(parameters['DefaultFontSize'] || 0);
 const FontMargin = Number(parameters['FontMargin'] || 10);
 const PageNextSymbol = NuunManager.getStringCode(parameters['PageNextSymbol']);
 const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSymbol']);
+const ResistanceColor = (DataManager.nuun_structureData(parameters['ResistanceColor'])) || 0;
+const WeaknessColor = (DataManager.nuun_structureData(parameters['WeaknessColor'])) || 0;
 const PageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList'])) : null) || [];
 const ParamList_1Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_1Page'])) : null) || [];
 const ParamList_2Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_2Page'])) : null) || [];
@@ -1475,6 +1685,7 @@ const StateResistCol = Number(parameters['StateResistCol'] || 2);
 const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
 const InvalidSlotHide = eval(parameters['InvalidSlotHide'] || "false");
 const StateResistColor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 0;
+const DisplayNameModo = String(parameters['DisplayNameModo'] || "param");
 const StatusRadarChartRadius = Number(parameters['StatusRadarChartRadius'] || 100);
 const StatusRadarChartFramecolor = Number(parameters['StatusResistCol'] || 15);
 const StatusRadarChartLineColor = Number(parameters['StatusRadarChartLineColor'] || 15);
@@ -1483,8 +1694,11 @@ const StatusRadarChartMainColor2 = Number(parameters['StatusRadarChartMainColor2
 const StatusRadarChartX = Number(parameters['StatusRadarChartX'] || 0);
 const StatusRadarChartY = Number(parameters['StatusRadarChartY'] || 0);
 const StatusRadarChart_FontSize = Number(parameters['StatusRadarChart_FontSize'] || 0);
+const StatusRadarChart_IconSize = Number(parameters['StatusRadarChart_IconSize'] || 0);
 const StatusRadarChartParamList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusRadarChartParamList'])) : [];
+const StatusRadarChartValueData = (DataManager.nuun_structureData(parameters['StatusRadarChartValueData']));
 const ElementRadarChartRadius = Number(parameters['ElementRadarChartRadius'] || 100);
+const ElementDisplayNameModo = String(parameters['ElementDisplayNameModo'] || "icon");
 const ElementRadarChartFramecolor = (DataManager.nuun_structureData(parameters['ElementRadarChartFramecolor'])) || 0;
 const ElementRadarChartLineColor = (DataManager.nuun_structureData(parameters['ElementRadarChartLineColor'])) || 0;
 const ElementRadarChartMainColor1 = (DataManager.nuun_structureData(parameters['ElementRadarChartMainColor1'])) || 0;
@@ -1492,7 +1706,9 @@ const ElementRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['
 const ElementRadarChartX = Number(parameters['ElementRadarChartX'] || 0);
 const ElementRadarChartY = Number(parameters['ElementRadarChartY'] || 0);
 const ElementRadarChart_FontSize = Number(parameters['ElementRadarChart_FontSize'] || 0);
+const ElementRadarChart_IconSize = Number(parameters['ElementRadarChart_IconSize'] || 0);
 const ElementRadarChartValueData = (DataManager.nuun_structureData(parameters['ElementRadarChartValueData']));
+const StateDisplayNameModo = String(parameters['StateDisplayNameModo'] || "icon");
 const StateRadarChartRadius = Number(parameters['StateRadarChartRadius'] || 100);
 const StateRadarChartFramecolor = (DataManager.nuun_structureData(parameters['StateRadarChartFramecolor'])) || 0;
 const StateRadarChartLineColor = (DataManager.nuun_structureData(parameters['StateRadarChartFramecolor'])) || 0;
@@ -1501,6 +1717,7 @@ const StateRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['St
 const StateRadarChartX = Number(parameters['StateRadarChartX'] || 0);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 0);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
+const StateRadarChart_IconSize = Number(parameters['StateRadarChart_IconSize'] || 0);
 const StartPage = Number(parameters['StartPage'] || 1);
 const StateRadarChartValueData = (DataManager.nuun_structureData(parameters['StateRadarChartValueData']));
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
@@ -1519,7 +1736,18 @@ PluginManager.registerCommand(pluginName, 'ChangeStartPage', args => {
 
 function startPages() {
   return ($gameTemp._startPage && $gameTemp._startPage > 0 ? $gameTemp._startPage : StartPage) - 1;
-}
+};
+
+function _getIconSize(type) {
+    switch (type) {
+        case "status":
+            return StatusRadarChart_IconSize;
+        case "element":
+            return ElementRadarChart_IconSize;
+        case "state":
+            return StateRadarChart_IconSize;
+    }
+};
 
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
@@ -1995,6 +2223,9 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
       break;
     case 6:
       this.drawPlaceStateIcon(x, y, this._actor);
+      break;
+    case 9:
+      this.nuunStatusDrawSkillPoint(list, this._actor, x, y, width);
       break;
     case 10:
     case 11:
@@ -2508,6 +2739,31 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
     }
 };
 
+Window_Status.prototype.nuunStatusDrawSkillPoint = function(list, actor, x, y, width) {
+    if (!Imported.NUUN_SkillTree) return;
+    const dactor = actor.actor();
+    const aclass = actor.currentClass();
+    this.contentsFontSize(list);
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    if (list.Back) {
+        this.drawContentsBackground(list.Back, x, y, width);
+        x = this.contensX(x);
+        width = this.contensWidth(width);
+    }
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    const systemWidth = this.systemWidth(list.SystemItemWidth, width);
+    const nameText = list.paramName ? list.paramName : NuunManager.getSkillPointParamName();
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
+    this.resetTextColor();
+    this.nuun_setContentsFontFace(list);
+    const textParam = (list.DetaEval ? eval(list.DetaEval) : actor.nsp);
+    this.nuun_DrawContentsParamUnitText(textParam, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
+};
+
 Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
     const dactor = actor.actor();
     const aclass = actor.currentClass();
@@ -2557,7 +2813,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
                 rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                 const r = rate;
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-                this.resetTextColor();
+                this.changeParamColor(rate);
                 this.nuun_setContentsFontFace(list);
                 this.nuun_DrawContentsParamUnitText(rateText, list, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), "%");
             }   
@@ -2617,7 +2873,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
                 if (actor.isStateResist(stateId)) {
                     this.changeTextColor(NuunManager.getColorCode(StateResistColor));
                 } else {
-                    this.resetTextColor();
+                    this.changeParamColor(rate);
                 }
                 this.nuun_setContentsFontFace(list);
                 this.nuun_DrawContentsParamUnitText(rateText, list, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), "%");
@@ -2736,35 +2992,37 @@ Window_Status.prototype.drawStatusRadarChart = function(list, actor, x, y) {
   if (!Imported.NUUN_RadarChartBase) {
     return;
   }
-  this.actorStatusRadarChart(this.setActorStatusChart(actor), actor, x, y,'status');
+  this.actorStatusRadarChart(list, this.setActorStatusChart(actor, list), actor, x, y,'status');
 };
 
 Window_Status.prototype.drawElementRadarChart = function(list, actor, x, y) {
-  if (!Imported.NUUN_RadarChartBase) {
-    return;
-  }
-  this.actorElementRadarChart(this.setActorElementChart(actor), actor, x, y,'element');
+    if (!Imported.NUUN_RadarChartBase) {
+        return;
+    }
+    this.actorElementRadarChart(list, this.setActorElementChart(actor, list), actor, x, y,'element');
 };
 
 Window_Status.prototype.drawStateRadarChart = function(list, actor, x, y) {
-  if (!Imported.NUUN_RadarChartBase) {
-    return;
-  }
-  this.actorStateRadarChart(this.setActorStateChart(actor), actor, x, y,'state');
+    if (!Imported.NUUN_RadarChartBase) {
+        return;
+    }
+    this.actorStateRadarChart(list, this.setActorStateChart(actor, list), actor, x, y,'state');
 };
 
-Window_Status.prototype.setActorStatusChart = function(actor) {
-  const data = [];
-  for (const status of StatusRadarChartParamList) {
-    let rate = 1;
-    const statusName = status.RadarChartParamName ? status.RadarChartParamName : TextManager.param(status.ParamLists);
-    const statusIconId = status.RadarChartIconIndex || 0;
-    data.push(this.setRadarChart(statusName, rate, statusIconId));
-  }
-  return data;
+Window_Status.prototype.setActorStatusChart = function(actor, list) {
+    const data = [];
+    for (const status of StatusRadarChartParamList) {
+        let value = actor.param(status.Param);
+        const statusName = status.RadarChartParamName ? status.RadarChartParamName : TextManager.param(status.Param);
+        const statusIconId = status.RadarChartIconIndex || 0;
+        const x = status.ValueX || 0;
+        const y = status.ValueY || 0;
+        data.push(this.setRadarChart(statusName, null, statusIconId, value, x, y, 0, DisplayNameModo));
+    }
+    return data;
 };
 
-Window_Status.prototype.setActorElementChart = function(actor) {
+Window_Status.prototype.setActorElementChart = function(actor, list) {
     const data = [];
     for (const element of ElementResist) {
         let rate = actor.elementRate(element.ElementNo);
@@ -2772,49 +3030,49 @@ Window_Status.prototype.setActorElementChart = function(actor) {
         const elementIconId = element.ElementIconId || 0;
         const x = element.ValueX || 0;
         const y = element.ValueY || 0;
-        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y));
+        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y, list.Decimal, ElementDisplayNameModo));
     }
     return data;
 };
 
-Window_Status.prototype.setActorStateChart = function(actor) {
+Window_Status.prototype.setActorStateChart = function(actor, list) {
     const data = [];
     for (const state of StateResist) {
         let stateId = state.StateNo;
         let rate = actor.stateRate(stateId);
         rate *= actor.isStateResist(stateId) ? 0 : 1;
         const stateName = $dataStates[stateId].name;
-        const iconId = !StateResistText ? $dataStates[stateId].iconIndex : 0;
+        const iconId = $dataStates[stateId].iconIndex || 0;
         const x = state.ValueX || 0;
         const y = state.ValueY || 0;
-        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y));
+        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y, list.Decimal, StateDisplayNameModo));
     }
     return data;
 };
 
-Window_Status.prototype.actorStatusRadarChart = function(list, actor, x, y, type) { 
+Window_Status.prototype.actorStatusRadarChart = function(data, list, actor, x, y, type) { 
     const key = "actorRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(StatusRadarChartFramecolor, StatusRadarChartLineColor, StatusRadarChartMainColor1, StatusRadarChartMainColor2, type);
-    sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize);
+    sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize, StatusRadarChartValueData, this.setChartData(data, type));
     sprite.move(x, y);
     sprite.show();
 };
 
-Window_Status.prototype.actorElementRadarChart = function(list, actor, x, y, type) { 
+Window_Status.prototype.actorElementRadarChart = function(data, list, actor, x, y, type) { 
     const key = "actorRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(ElementRadarChartFramecolor, ElementRadarChartLineColor, ElementRadarChartMainColor1, ElementRadarChartMainColor2, type);
-    sprite.setup(actor, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData);
+    sprite.setup(actor, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData, this.setChartData(data, type));
     sprite.move(x, y);
     sprite.show();
 };
 
-Window_Status.prototype.actorStateRadarChart = function(list, actor, x, y, type) { 
+Window_Status.prototype.actorStateRadarChart = function(data, list, actor, x, y, type) { 
     const key = "actorRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(StateRadarChartFramecolor, StateRadarChartLineColor, StateRadarChartMainColor1, StateRadarChartMainColor2, type);
-    sprite.setup(actor, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData);
+    sprite.setup(actor, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData, this.setChartData(data, type));
     sprite.move(x, y);
     sprite.show();
 };
@@ -2932,6 +3190,25 @@ Window_Status.prototype.isShowSlot = function(actor, index) {
         return !actor.isEquipTypeSealed(actor.equipSlots()[index]);
     } else {
         return true;
+    }
+};
+
+Window_Status.prototype.changeParamColor = function(value) {
+    if (value === 100) {
+        this.resetTextColor();
+    } else if (value > 100) {
+        this.changeTextColor((WeaknessColor >= 0 ? NuunManager.getColorCode(WeaknessColor) : ColorManager.powerDownColor()));
+    } else {
+        this.changeTextColor(ResistanceColor >= 0 ? NuunManager.getColorCode(ResistanceColor) : ColorManager.powerUpColor());
+    }
+};
+
+Window_Status.prototype.setChartData = function(list, type) {
+    return {
+        formula: list.DetaEval,
+        resistanceColor: ResistanceColor,
+        weaknessColor: WeaknessColor,
+        iconSize: _getIconSize(type)
     }
 };
 
