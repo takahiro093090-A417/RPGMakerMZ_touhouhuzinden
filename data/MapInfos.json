@@ -6,5 +6,5 @@ null,
 {"id":4,"expanded":false,"name":"普通の町","order":5,"parentId":0,"scrollX":869,"scrollY":874,"quick":false},
 {"id":5,"expanded":true,"name":"岩の洞窟","order":6,"parentId":0,"scrollX":821,"scrollY":701,"quick":false},
 {"id":6,"expanded":true,"name":"ファストトラベル","order":2,"parentId":0,"scrollX":3608,"scrollY":3594,"quick":false},
-{"id":7,"expanded":false,"name":"呪われた洞窟","order":7,"parentId":5,"scrollX":1622,"scrollY":1893,"quick":false}
+{"id":7,"expanded":false,"name":"呪われた洞窟","order":7,"parentId":5,"scrollX":1622,"scrollY":833,"quick":false}
 ]
